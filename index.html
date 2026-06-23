@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultado da Corrida</title>
+  <style>
+    :root {
+      --verde: #00b96b;
+      --verde-escuro: #007d47;
+      --cinza: #f4f5f7;
+      --texto: #1a1a2e;
+      --card: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--cinza);
+      color: var(--texto);
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0a2e1a 0%, #07401e 60%, #00b96b22 100%);
+      color: white;
+      padding: 2.5rem 1rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300b96b' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      position: relative;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      opacity: 0.75;
+      font-size: 1rem;
+      position: relative;
+    }
+
+    .chip {
+      display: inline-block;
+      background: var(--verde);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 0.75rem;
+      position: relative;
+    }
+
+    main {
+      max-width: 540px;
+      margin: -1.5rem auto 0;
+      padding: 0 1rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .search-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
+    .search-label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 0.6rem;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .search-input {
+      flex: 1;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--texto);
+      outline: none;
+      transition: border-color 0.2s;
+      -moz-appearance: textfield;
+    }
+
+    .search-input::-webkit-inner-spin-button,
+    .search-input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--verde);
+    }
+
+    .search-btn {
+      background: var(--verde);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem 1.4rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .search-btn:hover {
+      background: var(--verde-escuro);
+    }
+
+    .search-btn:active {
+      transform: scale(0.97);
+    }
+
+    .search-btn:disabled {
+      background: #a0d8bb;
+      cursor: not-allowed;
+    }
+
+    #resultado {
+      margin-top: 1.5rem;
+    }
+
+    .resultado-card {
+      background: #f8fffb;
+      border: 2px solid #c6f0da;
+      border-radius: 12px;
+      padding: 1.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .resultado-nome {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--texto);
+      margin-bottom: 1rem;
+    }
+
+    .resultado-destaque {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .resultado-tempo {
+      text-align: center;
+    }
+
+    .resultado-tempo .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #888;
+      font-weight: 600;
+    }
+
+    .resultado-tempo .valor {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--verde-escuro);
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .resultado-posicao {
+      text-align: center;
+    }
+
+    .resultado-posicao .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #888;
+      font-weight: 600;
+    }
+
+    .resultado-posicao .valor {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--texto);
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .resultado-posicao .valor span {
+      font-size: 1.2rem;
+      color: #888;
+      font-weight: 600;
+    }
+
+    .resultado-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .resultado-item {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.7rem 0.9rem;
+    }
+
+    .resultado-item .label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #aaa;
+      font-weight: 600;
+    }
+
+    .resultado-item .valor {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--texto);
+      margin-top: 2px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 1rem 0;
+    }
+
+    .badge-peito {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--verde);
+      color: white;
+      border-radius: 8px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .erro-card {
+      background: #fff5f5;
+      border: 2px solid #fed7d7;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      color: #c53030;
+      font-weight: 600;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .erro-card .erro-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #e2e8f0;
+      border-top-color: var(--verde);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .share-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      border: 1.5px solid #c6f0da;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--verde-escuro);
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background 0.2s;
+    }
+
+    .share-btn:hover {
+      background: #eafdf3;
+    }
+
+    .share-copied {
+      color: var(--verde);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: #bbb;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="chip">&#127939; Resultados Oficiais</div>
+  <h1>Corrida 4KM</h1>
+  <p>Consulte seu resultado pelo número de peito</p>
+</header>
+
+<main>
+  <div class="search-card">
+    <label class="search-label" for="input-peito">Número de peito</label>
+    <div class="search-row">
+      <input
+        type="number"
+        id="input-peito"
+        class="search-input"
+        placeholder="Ex: 799"
+        min="1"
+        max="9999"
+        inputmode="numeric"
+        autocomplete="off"
+      />
+      <button class="search-btn" id="btn-buscar" onclick="buscar()">
+        Buscar
+      </button>
+    </div>
+    <div id="resultado"></div>
+  </div>
+</main>
+
+<footer>
+  Resultados Gerais &mdash; 4KM
+</footer>
+
+<script>
+  const inputPeito = document.getElementById('input-peito');
+  const btnBuscar = document.getElementById('btn-buscar');
+  const divResultado = document.getElementById('resultado');
+
+  // Auto-busca pelo parâmetro da URL ao carregar
+  const params = new URLSearchParams(window.location.search);
+  const peitoUrl = params.get('peito');
+  if (peitoUrl) {
+    inputPeito.value = peitoUrl;
+    buscar();
+  }
+
+  inputPeito.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') buscar();
+  });
+
+  function formatarCategoria(cat) {
+    if (!cat) return '-';
+    const mapa = {
+      'M0017': 'Sub-18 Masc.',
+      'M1829': '18–29 Masc.',
+      'M3039': '30–39 Masc.',
+      'M4049': '40–49 Masc.',
+      'M5059': '50–59 Masc.',
+      'M6099': '60+ Masc.',
+      'F0017': 'Sub-18 Fem.',
+      'F1829': '18–29 Fem.',
+      'F3039': '30–39 Fem.',
+      'F4049': '40–49 Fem.',
+      'F5059': '50–59 Fem.',
+      'F6099': '60+ Fem.',
+    };
+    return mapa[cat] || cat;
+  }
+
+  function formatarNome(nome) {
+    return nome.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  async function buscar() {
+    const val = inputPeito.value.trim();
+    if (!val || isNaN(Number(val)) || Number(val) <= 0) {
+      divResultado.innerHTML = '<div class="erro-card"><div class="erro-icon">&#9888;</div><div>Digite um número de peito válido.</div></div>';
+      return;
+    }
+
+    divResultado.innerHTML = '<div class="loading">Buscando</div>';
+    btnBuscar.disabled = true;
+
+    // Atualiza URL sem recarregar
+    const novaUrl = new URL(window.location.href);
+    novaUrl.searchParams.set('peito', val);
+    history.replaceState(null, '', novaUrl.toString());
+
+    try {
+      const resp = await fetch(`/api/resultado?peito=${encodeURIComponent(val)}`);
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        divResultado.innerHTML = `
+          <div class="erro-card">
+            <div class="erro-icon">&#128681;</div>
+            <div>${data.erro || 'Número de peito não encontrado.'}</div>
+          </div>`;
+        return;
+      }
+
+      const posicaoCat = data.posicaoCategoria && data.posicaoCategoria !== '-'
+        ? `${data.posicaoCategoria}&#186;`
+        : '-';
+
+      const equipe = data.equipe || 'Individual';
+
+      const generoLabel = data.genero === 'F' ? '&#9792; Feminino' : '&#9794; Masculino';
+
+      divResultado.innerHTML = `
+        <div class="resultado-card">
+          <div class="badge-peito">
+            &#128681; Peito #${data.numeroPeito}
+          </div>
+          <div class="resultado-nome">${formatarNome(data.nome)}</div>
+          <div style="font-size:0.78rem;color:#888;font-weight:600;margin-bottom:0.75rem;">${generoLabel}</div>
+
+          <div class="resultado-destaque">
+            <div class="resultado-tempo">
+              <div class="label">Tempo final</div>
+              <div class="valor">${data.tempoLiquido || data.tempoChip}</div>
+            </div>
+            <div class="resultado-posicao">
+              <div class="label">Geral</div>
+              <div class="valor">${data.posicao}<span>&#186;</span></div>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="resultado-grid">
+            <div class="resultado-item">
+              <div class="label">Categoria</div>
+              <div class="valor">${formatarCategoria(data.categoria)}</div>
+            </div>
+            <div class="resultado-item">
+              <div class="label">Pos. categoria</div>
+              <div class="valor">${posicaoCat}</div>
+            </div>
+            <div class="resultado-item">
+              <div class="label">Equipe</div>
+              <div class="valor">${formatarNome(equipe)}</div>
+            </div>
+            <div class="resultado-item">
+              <div class="label">Distância</div>
+              <div class="valor">${data.distancia}</div>
+            </div>
+            <div class="resultado-item">
+              <div class="label">Idade</div>
+              <div class="valor">${data.idade} anos</div>
+            </div>
+            <div class="resultado-item">
+              <div class="label">Tempo chip</div>
+              <div class="valor">${data.tempoChip}</div>
+            </div>
+          </div>
+
+          <button class="share-btn" onclick="copiarLink(this)">
+            &#128279; Copiar link do resultado
+          </button>
+        </div>`;
+    } catch (err) {
+      divResultado.innerHTML = '<div class="erro-card"><div class="erro-icon">&#10060;</div><div>Erro ao buscar. Tente novamente.</div></div>';
+    } finally {
+      btnBuscar.disabled = false;
+    }
+  }
+
+  function copiarLink(btn) {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      btn.innerHTML = '<span class="share-copied">&#10003;</span> Link copiado!';
+      setTimeout(() => {
+        btn.innerHTML = '&#128279; Copiar link do resultado';
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
